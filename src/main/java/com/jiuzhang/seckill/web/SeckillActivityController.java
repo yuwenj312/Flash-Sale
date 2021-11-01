@@ -1,4 +1,4 @@
-package com.jiuzhang.seckill.db.web;
+package com.jiuzhang.seckill.web;
 import com.jiuzhang.seckill.db.dao.SeckillActivityDao;
 import com.jiuzhang.seckill.db.dao.SeckillCommodityDao;
 import com.jiuzhang.seckill.db.po.SeckillActivity;
@@ -8,7 +8,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -54,9 +53,9 @@ public class SeckillActivityController {
         seckillActivity.setActivityStatus(1);
         seckillActivity.setStartTime(format.parse(startTime));
         seckillActivity.setEndTime(format.parse(endTime));
-        resultMap.put("seckillActivity", seckillActivity);
         //插入数据库
         seckillActivityDao.inertSeckillActivity(seckillActivity);
+        resultMap.put("seckillActivity", seckillActivity);
         return "add_success";
     }
 
@@ -73,19 +72,19 @@ public class SeckillActivityController {
     private SeckillCommodityDao seckillCommodityDao;
                                // {} <- Pathvariable
     @RequestMapping("/item/{seckillActivityId}")
-    public String itemPage(Map<String, Object> resultMap, @PathVariable long
-            seckillActivityId) {
+    public String itemPage(Map<String, Object> resultMap, @PathVariable long seckillActivityId) { ////匹配上面的{}，将参数放入long中
         SeckillActivity seckillActivity =
-                seckillActivityDao.querySeckillActivityById(seckillActivityId);
+                seckillActivityDao.querySeckillActivityById(seckillActivityId);//通过id，把activity从数据库查出来
         SeckillCommodity seckillCommodity =
-                seckillCommodityDao.querySeckillCommodityById(seckillActivity.getCommodityId());
+                seckillCommodityDao.querySeckillCommodityById(seckillActivity.getCommodityId());//把库存从数据库查出来
+        //把这些显示在页面上，以下两种二选一
         resultMap.put("seckillActivity", seckillActivity);
         resultMap.put("seckillCommodity", seckillCommodity);
-        resultMap.put("seckillPrice", seckillActivity.getSeckillPrice());
-        resultMap.put("oldPrice", seckillActivity.getOldPrice());
-        resultMap.put("commodityId", seckillActivity.getCommodityId());
-        resultMap.put("commodityName", seckillCommodity.getCommodityName());
-        resultMap.put("commodityDesc", seckillCommodity.getCommodityDesc());
+//        resultMap.put("seckillPrice", seckillActivity.getSeckillPrice());
+//        resultMap.put("oldPrice", seckillActivity.getOldPrice());
+//        resultMap.put("commodityId", seckillActivity.getCommodityId());
+//        resultMap.put("commodityName", seckillCommodity.getCommodityName());//库存有的，否则NPE
+//        resultMap.put("commodityDesc", seckillCommodity.getCommodityDesc());
         return "seckill_item";
     }
 }
