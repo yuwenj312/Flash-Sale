@@ -10,29 +10,33 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class SeckillOverSellController {
+
     @Autowired
     private SeckillOverSellService seckillOverSellService;
+
     /**
      * 简单 处理抢购请求
-     * @param seckillActivityId * @return
+     * @param seckillActivityId
+     * @return
      */
-    @ResponseBody  //return jason
-    @RequestMapping("/seckill/{seckillActivityId}")
-    public String seckil(@PathVariable long seckillActivityId){
-        return seckillOverSellService.processSeckill(seckillActivityId);
-    }
+//    @ResponseBody
+//    @RequestMapping("/seckill/{seckillActivityId}")
+//    public String  seckil(@PathVariable long seckillActivityId){
+//        return seckillOverSellService.processSeckill(seckillActivityId);
+//    }
 
     @Autowired
     private SeckillActivityService seckillActivityService;
+
     /**
      * 使用 lua 脚本处理抢购请求
-     * @param seckillActivityId * @return
+     * @param seckillActivityId
+     * @return
      */
     @ResponseBody
     @RequestMapping("/seckill/{seckillActivityId}")
-    public String seckillCommodity(@PathVariable long seckillActivityId) {
-        boolean stockValidateResult =
-                seckillActivityService.seckillStockValidator(seckillActivityId);
+    public String seckillCommodity(@PathVariable long seckillActivityId) { //路径获取参数
+        boolean stockValidateResult = seckillActivityService.seckillStockValidator(seckillActivityId);
         return stockValidateResult ? "恭喜你秒杀成功" : "商品已经售完，下次再来";
     }
 }

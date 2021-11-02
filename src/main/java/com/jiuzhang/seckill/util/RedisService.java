@@ -1,4 +1,4 @@
-package com.jiuzhang.seckill.service;
+package com.jiuzhang.seckill.util;
 
 import org.junit.Test;
 import org.springframework.stereotype.Service;
@@ -32,40 +32,35 @@ public class RedisService {
         jedisClient.close();
         return value;
     }
-
     /**
-     * 缓存中库存判断和扣减 * @param key
+     * 缓存中库存判断和扣减
+     *
+     * @param key
      * @return
-     * @throws Exception */
-    public boolean stockDeductValidator(String key)  {
+     * @throws Exception
+     */
+    public boolean stockDeductValidator(String key) {
         try(Jedis jedisClient = jedisPool.getResource()) {
             String script = "if redis.call('exists',KEYS[1]) == 1 then\n" +
-                    "                 local stock = tonumber(redis.call('get',
-            KEYS[1]))\n" +
-            "                 if( stock <=0 ) then\n" +
+                    "                 local stock = tonumber(redis.call('get', KEYS[1]))\n" +
+                    "                 if( stock <=0 ) then\n" +
                     "                    return -1\n" +
-                    " end;\n" +
+                    "                 end;\n" +
                     "                 redis.call('decr',KEYS[1]);\n" +
                     "                 return stock - 1;\n" +
-                    " end;\n" +
+                    "             end;\n" +
                     "             return -1;";
-            Long stock = (Long) jedisClient.eval(script,
-                    Collections.singletonList(key), Collections.emptyList());
 
-            @Test
-            public void stockDeductValidatorTest(){
-                boolean result =  redisService.stockDeductValidator("stock:19");
-                System.out.println("result:"+result);
-                String stock =  redisService.getValue("stock:19");
-                System.out.println("stock:"+stock);
-            }
-
-            if (stock < 0) { System.out.println("库存不足"); return false;
-            } else { System.out.println("恭喜，抢购成功");
+            Long stock = (Long) jedisClient.eval(script, Collections.singletonList(key), Collections.emptyList());
+            if (stock < 0) {
+                System.out.println("库存不足");
+                return false;
+            } else {
+                System.out.println("恭喜，抢购成功");
             }
             return true;
         } catch (Throwable throwable) {
-            System.out.println("库存扣减失败:" + throwable.toString());
+            System.out.println("库存扣减失败：" + throwable.toString());
             return false;
         }
     }
